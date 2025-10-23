@@ -1,70 +1,126 @@
-<!DOCTYPE html>
-<html lang="en">
+
+<!doctype html>
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to Jojo Doctor</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>王老师古筝教室 · 以筝会友</title>
+<style>
+  :root{
+    --bg:#fdfaf6; --text:#333; --muted:#666;
+    --accent:#d4a36a; /* 温暖金杏色 */
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:"PingFang SC","Microsoft YaHei",Helvetica,Arial,sans-serif;color:var(--text);line-height:1.7;}
 
-  <style>
-    body {
-      font-family: "Helvetica Neue", Arial, sans-serif;
-      background: linear-gradient(120deg, #f8fafc, #e0f7fa);
-      margin: 0;
-      padding: 0;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-    }
+  /* 顶部导航 */
+  header{
+    position:fixed;inset:0 0 auto 0;height:64px;z-index:100;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 60px;background:rgba(255,255,255,.75);backdrop-filter:blur(10px);
+    box-shadow:0 1px 6px rgba(0,0,0,.05);
+  }
+  .logo{font-weight:700;color:var(--accent);font-size:20px;letter-spacing:.05em;}
+  nav a{color:var(--text);text-decoration:none;margin-left:24px;font-size:15px;transition:.2s;}
+  nav a:hover{color:var(--accent);}
 
-    h1 {
-      color: #0078AA;
-      font-size: 2.4rem;
-      margin-bottom: 0.5em;
-    }
+  /* ====== 首屏视频背景 ====== */
+  .hero{
+    position:relative;height:100vh;min-height:560px;overflow:hidden;
+    display:flex;align-items:center;
+  }
+  /* 背景视频铺满容器 */
+  .hero video{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    object-fit:cover; /* 关键：不变形铺满 */
+    z-index:0;
+    filter:brightness(0.95); /* 轻微压暗，让文字更清晰 */
+  }
+  /* 半透明白幕，保证可读性（可调 0.35~0.7） */
+  .hero::after{
+    content:"";position:absolute;inset:0;z-index:1;
+    background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.75));
+  }
+  .hero-content{
+    position:relative;z-index:2; /* 在视频与遮罩之上 */
+    max-width:600px;margin-left:8%;padding-top:64px; /* 给导航留出高度 */
+    animation:fadein 1.1s ease;
+  }
+  @keyframes fadein{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:none;}}
+  .hero h1{font-size:54px;margin:0 0 14px;}
+  .hero p{font-size:18px;color:var(--muted);margin:0 0 28px;}
+  .btn{
+    display:inline-block;padding:12px 24px;border-radius:8px;
+    text-decoration:none;font-weight:600;background:var(--accent);color:#fff;transition:.2s;
+  }
+  .btn:hover{opacity:.88;}
 
-    p {
-      max-width: 600px;
-      line-height: 1.6;
-      font-size: 1.1rem;
-      margin: 0 auto 1.5em;
-    }
+  /* 内容区 */
+  section.block{max-width:1100px;margin:0 auto;padding:80px 18px;}
+  h2{font-size:28px;margin-bottom:20px;color:var(--accent);}
+  p{color:var(--muted);}
+  .grid{display:grid;gap:20px;}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .card{background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.05);padding:24px;transition:.3s;}
+  .card:hover{transform:translateY(-4px);}
+  footer{text-align:center;padding:40px 18px;color:#888;border-top:1px solid #eee;background:#fff;margin-top:20px;}
 
-    a.button {
-      display: inline-block;
-      background: #0078AA;
-      color: white;
-      padding: 0.8em 1.6em;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
-
-    a.button:hover {
-      background: #005f80;
-    }
-
-    footer {
-      position: absolute;
-      bottom: 10px;
-      font-size: 0.85rem;
-      color: #666;
-    }
-  </style>
+  @media(max-width:900px){
+    header{padding:0 20px}
+    .hero h1{font-size:36px}
+    .grid.cols-3{grid-template-columns:1fr}
+  }
+</style>
 </head>
-
 <body>
-  <h1>Welcome to Jojo Doctor’s Website 👩‍⚕️</h1>
-  <p>
-    This is a sample static site hosted on <strong>Cloudflare Pages</strong>.<br/>
-    If you can see this, your deployment worked perfectly!
-  </p>
-  <a class="button" href="https://developers.cloudflare.com/pages/">Learn More →</a>
 
-  <footer>© 2025 Jojo Doctor. All rights reserved.</footer>
+<header>
+  <div class="logo">王老师古筝</div>
+  <nav>
+    <a href="#">首页</a>
+    <a href="#lesson">课程</a>
+    <a href="#about">关于</a>
+    <a href="#contact">联系</a>
+  </nav>
+</header>
+
+<section class="hero" aria-label="首屏视频背景">
+  <!-- 背景视频：确保 muted + playsinline 才能在移动端自动播放 -->
+  <video autoplay muted loop playsinline preload="auto" poster="assets/hero-poster.jpg">
+    <!-- 建议同时提供 mp4 与 webm，提升兼容性 -->
+    <source src="assets/liudong.webm" type="video/webm">
+    <source src="assets/liudong.mp4" type="video/mp4">
+    您的浏览器不支持视频标签。
+  </video>
+
+  <div class="hero-content">
+    <h1>让音乐，成为生活的温柔底色</h1>
+    <p>古筝课程 · 儿童与成人 · 一对一教学 · 快乐启蒙</p>
+    <a href="#contact" class="btn">预约试听</a>
+  </div>
+</section>
+
+<section class="block" id="lesson">
+  <h2>课程设置</h2>
+  <div class="grid cols-3">
+    <div class="card"><h3>启蒙课程</h3><p>识谱与基础指法，轻松入门，养成好习惯。</p></div>
+    <div class="card"><h3>进阶课程</h3><p>摇指/轮指/勾托抹挑系统训练，提升表现力。</p></div>
+    <div class="card"><h3>考级/演出班</h3><p>曲目精讲、舞台礼仪与心理建设，助力自信登台。</p></div>
+  </div>
+</section>
+
+<section class="block" id="about">
+  <h2>关于老师</h2>
+  <p>王老师毕业于××音乐学院古筝表演专业，10+年教学经验。课堂注重“快乐练琴、自然表达”，让孩子在愉快的氛围中爱上音乐。</p>
+</section>
+
+<section class="block" id="contact">
+  <h2>联系预约</h2>
+  <p>微信：<strong>GuzhengStudio</strong> ｜ 电话：<strong>(604) 000-0000</strong><br>
+     地址：Richmond / Burnaby（支持线上课程）</p>
+</section>
+
+<footer>© 2025 王老师古筝教室 · 用音乐点亮生活</footer>
 </body>
 </html>
