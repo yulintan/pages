@@ -137,19 +137,84 @@
 <!-- 缓冲：防止下一块被视频覆盖 -->
 <div style="height:80px"></div>
 
-<!-- 作品栏 -->
+<!-- 作品栏：最近 8 条（自动抓取） -->
 <section class="works" id="works">
   <h2>作品 · 演奏视频</h2>
-  <div class="featured">
-    <div class="video-wrap">
-      <video class="video" controls preload="metadata" poster="assets/posters/zuopin.jpg">
-        <source src="assets/videos/zuopin.mp4" type="video/mp4">
-        您的浏览器不支持视频播放。
-      </video>
-    </div>
-    <div class="title">《筝韵流光》课堂演奏片段</div>
-  </div>
+
+  <div id="yt-grid" class="video-grid"></div>
+
+  <noscript>请开启 JavaScript 以加载最新视频。</noscript>
 </section>
+
+<style>
+.video-grid{
+  display:grid; gap:18px; margin-top:14px;
+  grid-template-columns: repeat(4, 1fr);
+}
+@media (max-width: 1100px){ .video-grid{ grid-template-columns: repeat(3, 1fr);} }
+@media (max-width: 760px){  .video-grid{ grid-template-columns: repeat(2, 1fr);} }
+@media (max-width: 520px){  .video-grid{ grid-template-columns: 1fr;} }
+
+.yt-card{
+  position:relative; aspect-ratio:16/9; border-radius:12px; overflow:hidden;
+  background:#000 center/cover no-repeat; cursor:pointer;
+  box-shadow:0 4px 16px rgba(0,0,0,.08); border:1px solid #eee;
+}
+.yt-title{
+  position:absolute; left:8px; right:8px; bottom:8px;
+  background:linear-gradient(transparent, rgba(0,0,0,.65));
+  color:#fff; font-size:13px; padding:32px 10px 8px; line-height:1.35;
+  text-shadow:0 1px 2px rgba(0,0,0,.5);
+  max-height:60%; overflow:hidden;
+}
+.yt-card::after{
+  content:""; position:absolute; left:12px; bottom:12px; width:46px; height:46px;
+  background:rgba(0,0,0,.55);
+  -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><polygon points="24,18 24,46 46,32" fill="white"/></svg>') center/52% no-repeat;
+  mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><polygon points="24,18 24,46 46,32" fill="white"/></svg>') center/52% no-repeat;
+  border-radius:50%; transition:.2s;
+}
+.yt-card:hover::after{ background:rgba(0,0,0,.75); }
+
+.yt-iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
+</style>
+
+<script>
+// 渲染最近 8 条（来自 Pages Functions）
+(async function(){
+  const channel = "UCK_5Kn9S1xAv2WpVjVgflqQ"; // Daisy 的频道 ID
+  const res = await fetch(`/api/youtube?channel=${channel}&limit=8`);
+  const data = await res.json();
+  const grid = document.getElementById('yt-grid');
+
+  if (!data.items || !data.items.length) {
+    grid.innerHTML = '<p style="color:#666">暂时没有可展示的视频。</p>';
+    return;
+  }
+
+  data.items.forEach(v => {
+    const card = document.createElement('div');
+    card.className = 'yt-card';
+    card.style.backgroundImage = `url(${v.thumb})`;
+
+    const title = document.createElement('div');
+    title.className = 'yt-title';
+    title.textContent = v.title;
+    card.appendChild(title);
+
+    card.addEventListener('click', ()=>{
+      const iframe = document.createElement('iframe');
+      iframe.className = 'yt-iframe';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+      iframe.src = `https://www.youtube.com/embed/${v.videoId}?rel=0&modestbranding=1&autoplay=1`;
+      card.replaceChildren(iframe);
+    }, { once:true });
+
+    grid.appendChild(card);
+  });
+})();
+</script>
 
 <!-- 在售古筝 -->
 <section class="block market" id="market">
